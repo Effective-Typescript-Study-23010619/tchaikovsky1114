@@ -1,7 +1,65 @@
 
-// 예시 2. 구조적 타이핑의 문제점
+
+// 예시 1. 제네릭 VolunteerTeam에 extends User를 사용하지 않는다면?
 
 enum Days { Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday }
+interface User {
+  name: string;
+  age: number;
+}
+
+interface Volunteer extends User {
+  gender: string;
+  availableDay: Partial<Days>[];
+}
+
+interface Expert extends User {
+  occupation: string;
+}
+
+interface Villain {
+  what: string;
+}
+
+type VolunteerTeam6<T> = T[];
+
+const GoodNeighbor4: VolunteerTeam6<Volunteer | Expert | Villain> = [
+  { 
+    name: '김명성',
+    age: 34,
+    gender: '남자',
+    availableDay: [Days.Friday, Days.Saturday, Days.Sunday],
+    occupation: '구호활동가',
+  },
+  {
+    name: '최경민',
+    what: 'so what?'
+  },
+  {
+    name: '이경택',
+    age: 27,
+    gender: '남자', 
+    availableDay: [Days.Monday],
+  },
+  {
+    name: '장경찬',
+    age: 27,
+    gender: '남자',
+    availableDay: [Days.Friday],
+  },
+]
+
+// extends User를 사용할 때에는 VolunteerTeam에는 User 타입을 만족하지 않은 객체가 들어올 수 없었지만 제약이 무너지면서 타입 에러가 발생하지 않는다.
+// 만약 VolunteerTeam2가 extends User를 사용하였다면 기존에는 
+// 'Volunteer | Expert | Villain' 형식이 'User' 제약 조건을 만족하지 않으며
+// 'Villain' 형식에 'User' 형식의 name, age 속성이 없습니다.ts(2344) 에러를 출력하겠지만
+// extends User를 사용하지 않았기 때문에 에러가 발생하지 않는다.
+// 이렇게 extends는 매개변수로 들어온 타입을 제약하는 역할을 한다.
+
+
+
+
+// 예시 2. 구조적 타이핑의 문제점
 
 interface User {
   name: string;
@@ -155,9 +213,6 @@ const GoodNeighbor3: VolunteerTeam<Part3> = [
 ]
 
 // Omit은 문제를 해결하지 못한다
-
-
-
 interface Volunteer4 extends User {
   gender: string;
   availableDay: Partial<Days>[];
@@ -183,43 +238,12 @@ console.log(whatismytype4.occupation)
 
 
 
+// 예제 3번
+type MissPick<T, K> = {
+  [k in K]: T[k]
+};
 
-
-// VolunteerTeam에 extends User를 사용하지 않는다면?;
-
-interface Villain {
-  what: string;
+// 예제 4번
+type RightPick<T, K extends keyof T> = {
+  [k in K]: T[k]
 }
-
-type VolunteerTeam6<T> = T[];
-
-const GoodNeighbor4: VolunteerTeam6<Volunteer | Expert | Villain> = [
-  { 
-    name: '김명성',
-    age: 34,
-    gender: '남자',
-    availableDay: [Days.Friday, Days.Saturday, Days.Sunday],
-    occupation: '구호활동가',
-  },
-  {
-    name: '최경민',
-    what: 'so what?'
-  },
-  {
-    name: '이경택',
-    age: 27,
-    gender: '남자', 
-    availableDay: [Days.Monday],
-  },
-  {
-    name: '장경찬',
-    age: 27,
-    gender: '남자',
-    availableDay: [Days.Friday],
-  },
-]
-
-// extends User를 사용할 때에는 VolunteerTeam에는 User 타입을 만족하지 않은 객체가 들어올 수 없었지만 제약이 무너지면서 타입 에러가 발생하지 않는다.
-// 만약 VolunteerTeam2가 extends User를 사용하였다면 기존에는 
-// 'Volunteer | Expert | Villain' 형식이 'User' 제약 조건을 만족하지 않습니다. 'Villain' 형식에 'User' 형식의 name, age 속성이 없습니다.ts(2344)
-// 라는 에러를 발생시켰지만 extends User를 사용하지 않는다면 에러가 발생하지 않는다.
